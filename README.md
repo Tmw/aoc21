@@ -4,7 +4,7 @@
 
 ## Index
 
-- [Day One](lib/days/01_day_one)
-- [Day Two](lib/days/02_day_two)
-- [Day Three](lib/days/03_day_three)
+- [Day One](lib/days/01_day_one/day_one.ex)
+- [Day Two](lib/days/02_day_two/day_two.ex)
+- [Day Three](lib/days/03_day_three/day_three.ex)
 
