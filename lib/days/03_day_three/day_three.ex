@@ -4,10 +4,8 @@ defmodule Aoc21.DayThree do
   defp parse_line(line, acc \\ [])
   defp parse_line(<<>>, acc), do: acc
 
-  defp parse_line(<<h::binary-size(1), rest::binary>>, acc) do
-    h = to_int(h)
-    parse_line(rest, acc ++ [h])
-  end
+  defp parse_line(<<h::binary-size(1), rest::binary>>, acc),
+    do: parse_line(rest, acc ++ [to_int(h)])
 
   # expected to return 2648450
   # We're using Nx tensors to get the mean over the Y axis
