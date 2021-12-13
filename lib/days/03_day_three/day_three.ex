@@ -28,10 +28,7 @@ defmodule Aoc21.DayThree do
 
     bit_length = length(averages)
     gamma = Integer.undigits(averages, 2)
-
-    epsilon =
-      gamma
-      |> Bitwise.bxor(create_mask(bit_length))
+    epsilon = Bitwise.bxor(gamma, create_mask(bit_length))
 
     gamma * epsilon
   end
