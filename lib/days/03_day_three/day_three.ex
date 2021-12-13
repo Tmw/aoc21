@@ -27,37 +27,17 @@ defmodule Aoc21.DayThree do
       |> Enum.map(&trunc/1)
 
     bit_length = length(averages)
+    gamma = Integer.undigits(averages, 2)
 
-    gamma =
-      averages
-      |> list_to_binary()
-      |> grab_number()
-
-    mask =
-      bit_length
-      |> create_mask()
-      |> grab_number()
-
-    epsilon = Bitwise.bxor(gamma, mask)
+    epsilon =
+      gamma
+      |> Bitwise.bxor(create_mask(bit_length))
 
     gamma * epsilon
   end
 
-  defp list_to_binary(list) do
-    for n <- list, reduce: <<>> do
-      acc -> <<acc::bitstring, n::size(1)>>
-    end
-  end
-
   defp create_mask(length) do
-    for _ <- 1..length, reduce: <<>> do
-      acc -> <<acc::bitstring, 1::size(1)>>
-    end
-  end
-
-  defp grab_number(binary) do
-    bit_length = bit_size(binary)
-    <<number::size(bit_length)>> = binary
-    number
+    mask_as_list = for _ <- 1..length, into: [], do: 1
+    Integer.undigits(mask_as_list, 2)
   end
 end
