@@ -26,6 +26,37 @@ defmodule Aoc21.DayThree do
     gamma * epsilon
   end
 
+  #  ¯\_(ツ)_/¯
+  #  And part A once more but without using nx 
+  def without_nx do
+    split = fn row ->
+      {{min, _}, {max, _}} =
+        row
+        |> Enum.frequencies()
+        |> Enum.min_max_by(fn {x, value} -> {value, x} end)
+
+      [min, max]
+    end
+
+    to_number = fn item ->
+      item
+      |> Tuple.to_list()
+      |> List.to_string()
+      |> String.to_integer(2)
+    end
+
+    [epsilon, gamma] =
+      input_as_lines()
+      |> Enum.map(&String.graphemes/1)
+      |> Enum.zip()
+      |> Enum.map(&Tuple.to_list/1)
+      |> Enum.map(split)
+      |> Enum.zip()
+      |> Enum.map(to_number)
+
+    epsilon * gamma
+  end
+
   # expected to return 2845944
   # Passing the parsed lines to our search function for finding both the oxygen and the co2 readings.
   def part_two do
@@ -52,7 +83,6 @@ defmodule Aoc21.DayThree do
   # the new average on the remainder of the candidates.
   # We repeat this proces until we have one candidate that matches the predicate
   # on the bits from left to right.
-
   defp search(list, predicate: predicate) do
     # grab size of list inside nested list
     highest_bit = list |> hd() |> length()
