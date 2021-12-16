@@ -23,7 +23,7 @@ defmodule Aoc21.DayFour do
     end)
   end
 
-  defp check_winner(boards), do: Enum.find(boards, &won?/1)
+  defp check_winners(boards), do: Enum.filter(boards, &won?/1)
 
   defp won?(board) do
     is_winning_row? = fn row ->
@@ -53,26 +53,56 @@ defmodule Aoc21.DayFour do
     end)
   end
 
+  defp play_to_completion(boards, sequence) do
+    Enum.reduce_while(sequence, {boards, []}, fn number, {boards, wins} ->
+      boards = boards |> mark(number)
+
+      case check_winners(boards) do
+        [] ->
+          {:cont, {boards, wins}}
+
+        winners ->
+          # move winning board to won list, don't consider it part
+          # of the game anymore.
+          boards = Enum.filter(boards, &(!Enum.member?(winners, &1)))
+
+          # tag all recent winners with the number that made them winning
+          new_winners = Enum.map(winners, fn winner -> {winner, String.to_integer(number)} end)
+
+          # and stop the reducer once there's no more boards in the game
+          # eg. when all boards have reached a won status
+          if length(boards) > 0 do
+            {:cont, {boards, wins ++ new_winners}}
+          else
+            {:halt, {boards, wins ++ new_winners}}
+          end
+      end
+    end)
+  end
+
+  # Expected to return 11774
   def part_one do
     [sequence | rest] = input_as_lines()
     [_ | boards] = rest
 
     sequence = String.split(sequence, ",", trim: true)
     boards = parse_boards(boards)
+    {_, wins} = play_to_completion(boards, sequence)
+    {winning_board, with_number} = List.first(wins)
 
-    {winning_board, with_number} =
-      Enum.reduce_while(sequence, boards, fn number, boards ->
-        boards = boards |> mark(number)
+    get_unmarked_sum(winning_board) * with_number
+  end
 
-        case check_winner(boards) do
-          nil -> {:cont, boards}
-          winner -> {:halt, {winner, number}}
-        end
-      end)
+  # Expected to return 4495
+  def part_two do
+    [sequence | rest] = input_as_lines()
+    [_ | boards] = rest
 
-    unmarked_sum = get_unmarked_sum(winning_board)
-    winning_number = with_number |> String.to_integer()
+    sequence = String.split(sequence, ",", trim: true)
+    boards = parse_boards(boards)
+    {_, wins} = play_to_completion(boards, sequence)
+    {winning_board, with_number} = List.last(wins)
 
-    unmarked_sum * winning_number
+    get_unmarked_sum(winning_board) * with_number
   end
 end
