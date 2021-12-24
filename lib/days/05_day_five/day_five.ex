@@ -59,12 +59,12 @@ defmodule Aoc21.DayFive do
   # a line segment is considered orthogonal when both points
   # share either the same X or Y coordinate.
   defp only_orthogonals(segments) do
-    is_ortogonal? = fn
+    is_orthogonal? = fn
       {{x, _}, {x, _}} -> true
       {{_, y}, {_, y}} -> true
       _ -> false
     end
 
-    Enum.filter(segments, is_ortogonal?)
+    Enum.filter(segments, is_orthogonal?)
   end
 end
