@@ -8,4 +8,5 @@
 - [Day Two](lib/days/02_day_two/day_two.ex)
 - [Day Three](lib/days/03_day_three/day_three.ex)
 - [Day Four](lib/days/04_day_four/day_four.ex)
+- [Day Five](lib/days/05_day_five/day_five.ex)
 
