@@ -24,5 +24,6 @@ defmodule Aoc21Test do
 
   test "Day five" do
     assert Aoc21.DayFive.part_one() == 6572
+    assert Aoc21.DayFive.part_two() == 21466
   end
 end

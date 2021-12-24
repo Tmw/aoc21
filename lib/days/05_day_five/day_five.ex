@@ -2,16 +2,23 @@ defmodule Aoc21.DayFive do
   use Aoc21.Elves
   @segment_pattern ~r/,|\s->\s/
 
+  # expected to return 5
   def part_one do
-    segments =
-      input_as_lines()
-      |> parse_segments()
-      |> only_orthogonals()
+    segments()
+    |> only_orthogonals()
+    |> plot_lines()
+    |> count_busy_spots()
+  end
 
-    result =
-      segments
-      |> plot_lines()
-      |> count_busy_spots()
+  # expected to return 12
+  def part_two do
+    segments()
+    |> plot_lines()
+    |> count_busy_spots()
+  end
+
+  defp segments do
+    input_as_lines() |> parse_segments()
   end
 
   defp count_busy_spots(plotted_lines) do
@@ -36,11 +43,17 @@ defmodule Aoc21.DayFive do
   end
 
   # expanding a segment means returning all intermediate points
-  # so they can be used in the final calculation. Note this will only work
-  # for orthogonal segments currently?
-  defp expand_segment({{x1, y1}, {x2, y2}}) do
-    for x <- x1..x2, y <- y1..y2, do: {x, y}
-  end
+  # so they can be used in the final calculation. For orthogonal segments
+  # we can simply enumerate all points between the two coordinates
+  #
+  # for diagonal lines we're taking the zipped version of both lists as 
+  # diagonals always have the 45 degree angle as stated in the assignment.
+  def expand_segment(input)
+
+  def expand_segment({{x1, y1}, {x2, y2}}) when x1 == x2 or y1 == y2,
+    do: for(x <- x1..x2, y <- y1..y2, do: {x, y})
+
+  def expand_segment({{x1, y1}, {x2, y2}}), do: Enum.zip(x1..x2, y1..y2)
 
   defp parse_segments(segments) do
     segments
