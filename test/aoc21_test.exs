@@ -26,4 +26,9 @@ defmodule Aoc21Test do
     assert Aoc21.DayFive.part_one() == 6572
     assert Aoc21.DayFive.part_two() == 21466
   end
+
+  test "Day six" do
+    assert Aoc21.DaySix.part_one() == 365_131
+    assert Aoc21.DaySix.part_two() == 1_650_309_278_600
+  end
 end
