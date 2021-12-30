@@ -57,7 +57,7 @@ defmodule Aoc21.DayEight.Decoder do
   def decode(signals, decoded \\ %{})
   def decode([], decoded), do: decoded
 
-  # recusrive function that takes the first signal off the list and tries to
+  # Recusive function that takes the first signal off the list and tries to
   # decode it. Succesful decodes are stored in the `decoded` map, however
   # if we are unable to decode the signal at this time (eg. because the easy
   # cases have not been decoded yet) we're moving the signal to the end of the
