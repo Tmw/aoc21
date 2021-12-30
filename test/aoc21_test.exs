@@ -41,4 +41,8 @@ defmodule Aoc21Test do
     assert Aoc21.DayEight.part_one() == 237
     assert Aoc21.DayEight.part_two() == 1_009_098
   end
+
+  test "Day nine" do
+    assert Aoc21.DayNine.part_one() == 548
+  end
 end

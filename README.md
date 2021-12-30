@@ -12,4 +12,5 @@
 - [Day Six](lib/days/06_day_six/day_six.ex)
 - [Day Seven](lib/days/07_day_seven/day_seven.ex)
 - [Day Eight](lib/days/08_day_eight/day_eight.ex)
+- [Day Nine](lib/days/09_day_nine/day_nine.ex)
 
