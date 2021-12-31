@@ -23,8 +23,8 @@ defmodule Aoc21.DayNine do
 
     grid
     |> find_low_points()
-    |> Enum.map(fn {x, y, _v} ->
-      measure_basin(grid, x, y) |> MapSet.size()
+    |> Enum.map(fn {x, y, v} ->
+      measure_basin(grid, [{x, y, v}]) |> MapSet.size()
     end)
     |> Enum.sort(&(&1 > &2))
     |> Enum.take(3)
@@ -49,8 +49,12 @@ defmodule Aoc21.DayNine do
     end
   end
 
-  # Naive implementation of recursive floodfill, not utilizing tco though..
-  defp measure_basin(grid, x, y, area \\ 0, visited \\ MapSet.new()) do
+  defp measure_basin(grid, candidates, visited \\ MapSet.new())
+  defp measure_basin(_grid, [], visited), do: visited
+
+  defp measure_basin(grid, [{x, y, _v} | candidates], visited) do
+    visited = MapSet.put(visited, {x, y})
+
     unvisited = fn {x, y, _v} ->
       MapSet.member?(visited, {x, y}) == false
     end
@@ -59,23 +63,13 @@ defmodule Aoc21.DayNine do
       v != 9
     end
 
-    # mark current cell as visited
-    visited = MapSet.put(visited, {x, y})
-
-    # get all unvisited neighbours whose value is not 9
-    candidates =
+    new_candidates =
       grid
       |> Grid.get_neighbours(x, y)
       |> Enum.filter(unvisited)
       |> Enum.filter(not_nine)
 
-    if Enum.empty?(candidates) do
-      visited
-    else
-      Enum.reduce(candidates, visited, fn {x, y, _v}, visited ->
-        measure_basin(grid, x, y, area + 1, visited)
-      end)
-    end
+    measure_basin(grid, candidates ++ new_candidates, visited)
   end
 
   defp parse(input) do
