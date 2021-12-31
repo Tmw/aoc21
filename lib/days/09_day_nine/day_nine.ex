@@ -21,7 +21,14 @@ defmodule Aoc21.DayNine do
   def part_two do
     grid = input_as_lines() |> parse()
 
-    find_low_points(grid)
+    grid
+    |> find_low_points()
+    |> Enum.map(fn {x, y, _v} ->
+      measure_basin(grid, x, y) |> MapSet.size()
+    end)
+    |> Enum.sort(&(&1 > &2))
+    |> Enum.take(3)
+    |> Enum.product()
   end
 
   # finds the lowest points by comparing each coordinate
@@ -39,6 +46,35 @@ defmodule Aoc21.DayNine do
         |> then(fn lowest? ->
           if lowest?, do: low_points ++ [{x, y, current_value}], else: low_points
         end)
+    end
+  end
+
+  # Naive implementation of recursive floodfill, not utilizing tco though..
+  defp measure_basin(grid, x, y, area \\ 0, visited \\ MapSet.new()) do
+    unvisited = fn {x, y, _v} ->
+      MapSet.member?(visited, {x, y}) == false
+    end
+
+    not_nine = fn {_x, _y, v} ->
+      v != 9
+    end
+
+    # mark current cell as visited
+    visited = MapSet.put(visited, {x, y})
+
+    # get all unvisited neighbours whose value is not 9
+    candidates =
+      grid
+      |> Grid.get_neighbours(x, y)
+      |> Enum.filter(unvisited)
+      |> Enum.filter(not_nine)
+
+    if Enum.empty?(candidates) do
+      visited
+    else
+      Enum.reduce(candidates, visited, fn {x, y, _v}, visited ->
+        measure_basin(grid, x, y, area + 1, visited)
+      end)
     end
   end
 
