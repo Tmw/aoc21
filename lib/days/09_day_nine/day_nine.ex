@@ -26,7 +26,7 @@ defmodule Aoc21.DayNine do
     |> Enum.map(fn {x, y, v} ->
       measure_basin(grid, [{x, y, v}]) |> MapSet.size()
     end)
-    |> Enum.sort(&(&1 > &2))
+    |> Enum.sort(:desc)
     |> Enum.take(3)
     |> Enum.product()
   end
