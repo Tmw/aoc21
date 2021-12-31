@@ -67,9 +67,6 @@ defmodule Aoc21.DayNine.Grid do
   end
 
   # get up to four neighbouring grid cells given a coordinate.
-  #
-  # TODO: Probably should return the full thing with coordinates and all.
-  #       this will be easier to use in part two
   def get_neighbours(grid, x, y) do
     neighbouring_coordinates = [
       {x - 1, y},
