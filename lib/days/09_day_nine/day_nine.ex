@@ -49,6 +49,9 @@ defmodule Aoc21.DayNine do
     end
   end
 
+  # From a given coordinate, iterate outwards until we've visited all neighbours
+  # or untill the rest of the unvisited neighbours are all 9s. valid cells in the
+  # MapSet so we can measure the size of 'em later.
   defp measure_basin(grid, candidates, visited \\ MapSet.new())
   defp measure_basin(_grid, [], visited), do: visited
 
