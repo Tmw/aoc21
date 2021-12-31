@@ -31,11 +31,14 @@ defmodule Aoc21.DayNine do
 
     for y <- 0..(height - 1), x <- 0..(width - 1), reduce: [] do
       low_points ->
-        neighbouring_cells = Grid.get_neighbours(grid, x, y)
-        curr_value = Grid.get_value(grid, x, y)
+        current_value = Grid.get_value(grid, x, y)
 
-        lowest? = Enum.all?(neighbouring_cells, &Kernel.>(&1, curr_value))
-        if lowest?, do: low_points ++ [{x, y, curr_value}], else: low_points
+        grid
+        |> Grid.get_neighbours(x, y)
+        |> Enum.all?(fn {_x, _Y, value} -> value > current_value end)
+        |> then(fn lowest? ->
+          if lowest?, do: low_points ++ [{x, y, current_value}], else: low_points
+        end)
     end
   end
 
@@ -85,6 +88,6 @@ defmodule Aoc21.DayNine.Grid do
 
     neighbouring_coordinates
     |> Enum.filter(bounds_check)
-    |> Enum.map(fn {x, y} -> get_value(grid, x, y) end)
+    |> Enum.map(fn {x, y} -> {x, y, get_value(grid, x, y)} end)
   end
 end
