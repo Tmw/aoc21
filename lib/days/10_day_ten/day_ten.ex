@@ -15,13 +15,44 @@ defmodule Aoc21.DayTen do
     ">" => 25137
   }
 
+  @syntax_completion_costs %{
+    "(" => 1,
+    "[" => 2,
+    "{" => 3,
+    "<" => 4
+  }
+
   def part_one do
+    only_illigal = &is_tuple/1
+
     parsed()
     |> analyze_input()
-    |> Enum.filter(&is_tuple/1)
+    |> Enum.filter(only_illigal)
     |> Enum.map(&elem(&1, 1))
     |> Enum.map(&Map.get(@syntax_error_scores, &1))
     |> Enum.sum()
+  end
+
+  def part_two do
+    only_incomplete = &is_list/1
+
+    parsed()
+    |> analyze_input()
+    |> Enum.filter(only_incomplete)
+    |> Enum.map(&cost_per_line/1)
+    |> Enum.sort()
+    |> then(fn list ->
+      middle_index = Enum.count(list) |> div(2)
+      Enum.at(list, middle_index)
+    end)
+  end
+
+  defp cost_per_line(incomplete) do
+    incomplete
+    |> Enum.map(&Map.get(@syntax_completion_costs, &1))
+    |> Enum.reduce(0, fn cost, total ->
+      total * 5 + cost
+    end)
   end
 
   defp analyze_input(input) do
