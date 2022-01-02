@@ -23,11 +23,13 @@ defmodule Aoc21.DayEleven do
   end
 
   defp simulate_flashes(grid, flashed \\ MapSet.new()) do
-    # check if thre's any octopuses that reached their maximum energy level
+    # check if thre's any octopuses that reached their maximum energy level.
+    # Once an octopus has reached its maximum energy level it will not be
+    # affected by its neighbours until we reset and advance the grid.
     energized_octopuses =
       grid
       |> find_energized_octopuses()
-      |> Enum.filter(fn coord -> MapSet.member?(flashed, coord) == false end)
+      |> Enum.filter(&(MapSet.member?(flashed, &1) == false))
 
     case energized_octopuses do
       [] ->
@@ -47,6 +49,8 @@ defmodule Aoc21.DayEleven do
               end)
           end
 
+        # keep track of currently flashing octopuses and recurse until there's
+        # no more flashing
         flashed = Enum.reduce(flashing_octopuses, flashed, &MapSet.put(&2, &1))
         simulate_flashes(grid, flashed)
     end
@@ -59,8 +63,7 @@ defmodule Aoc21.DayEleven do
   end
 
   defp advance(grid) do
-    grid
-    |> Enum.map(fn line ->
+    Enum.map(grid, fn line ->
       Enum.map(line, &Kernel.+(&1, 1))
     end)
   end
@@ -77,8 +80,7 @@ defmodule Aoc21.DayEleven do
   end
 
   defp parse do
-    input_as_lines()
-    |> Enum.map(fn line ->
+    Enum.map(input_as_lines(), fn line ->
       line
       |> String.graphemes()
       |> Enum.map(&to_int/1)
