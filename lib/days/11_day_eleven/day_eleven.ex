@@ -4,22 +4,33 @@ defmodule Aoc21.DayEleven do
   @max_energy_level 9
 
   def part_one do
-    grid = parse()
+    parse()
+    |> iterate_until(fn _grid, iteration -> iteration == 100 end)
+    |> then(fn {_grid, flashes, _iterations} -> flashes end)
+  end
 
-    steps = 100
+  def part_two do
+    all_zeroes? = fn grid ->
+      Enum.all?(grid, fn row -> Enum.all?(row, &(&1 > @max_energy_level)) end)
+    end
 
-    {_grid, flashes} =
-      for _step <- 0..(steps - 1), reduce: {grid, 0} do
-        {grid, flashes} ->
-          {grid, new_flashes} =
-            grid
-            |> advance()
-            |> simulate_flashes()
+    parse()
+    |> iterate_until(fn grid, _iteration -> all_zeroes?.(grid) end)
+    |> then(fn {_grid, _flashes, iterations} -> iterations end)
+  end
 
-          {grid |> reset(), flashes + new_flashes}
-      end
+  defp iterate_until(grid, should_stop?) when is_list(grid),
+    do: iterate_until({grid, 0}, 0, should_stop?)
 
-    flashes
+  defp iterate_until({grid, flashes}, iteration, should_stop?) do
+    {grid, new_flashes} =
+      grid
+      |> advance()
+      |> simulate_flashes()
+
+    if should_stop?.(grid, iteration),
+      do: {grid, flashes, iteration + 1},
+      else: iterate_until({grid |> reset(), flashes + new_flashes}, iteration + 1, should_stop?)
   end
 
   defp simulate_flashes(grid, flashed \\ MapSet.new()) do
