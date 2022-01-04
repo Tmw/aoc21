@@ -15,4 +15,5 @@
 - [Day Nine](lib/days/09_day_nine/day_nine.ex)
 - [Day Ten](lib/days/10_day_ten/day_ten.ex)
 - [Day Eleven](lib/days/11_day_eleven/day_eleven.ex)
+- [Day Twelve](lib/days/12_day_twelve/day_twelve.ex)
 
