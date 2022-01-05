@@ -64,7 +64,9 @@ end
 
 defmodule Aoc21.DayTwelve.Graph.TraversalStrategy do
   @moduledoc """
-  behaviour that describes a graph traversal strategy by determining wether moving to a given node from a current node and a given travel history would be legal or not.
+  behaviour that describes a graph traversal strategy by determining wether 
+  moving to a given node from a current node and a given travel history 
+  would be legal or not.
   """
   @typep graph_node :: String.t()
   @callback legal_move?(
@@ -97,7 +99,8 @@ end
 
 defmodule Aoc21.DayTwelve.Graph.TraversalStrategy.SingleRevisit do
   @moduledoc """
-  Using this traversal strategy ensures we're visiting one small cave at most twice.
+  Using this traversal strategy ensures we're visiting one small cave 
+  at most twice.
   """
   @behaviour Aoc21.DayTwelve.Graph.TraversalStrategy
 
@@ -111,15 +114,14 @@ defmodule Aoc21.DayTwelve.Graph.TraversalStrategy.SingleRevisit do
       _ -> false
     end
 
-    legal_move? =
-      ([considered_node, current_node] ++ history)
-      |> Enum.filter(&small_cave?/1)
-      |> Enum.frequencies()
-      |> Map.values()
-      |> Enum.sort(:desc)
-      |> then(checker_fn)
-
-    legal_move?
+    # if we would travel like this, how many times did we visit a small
+    # cave twice?
+    ([considered_node, current_node] ++ history)
+    |> Enum.filter(&small_cave?/1)
+    |> Enum.frequencies()
+    |> Map.values()
+    |> Enum.sort(:desc)
+    |> then(checker_fn)
   end
 
   defp small_cave?(cave) do
