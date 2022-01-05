@@ -1,13 +1,25 @@
 defmodule Aoc21.DayTwelve do
   use Aoc21.Elves
   alias Aoc21.DayTwelve.Graph
+  alias Aoc21.DayTwelve.Graph.TraversalStrategy
 
   def part_one do
     graph = input_as_lines() |> Graph.new()
-    find_paths(graph) |> Enum.count()
+
+    graph
+    |> find_paths(strategy: TraversalStrategy.SingleVisit)
+    |> Enum.count()
   end
 
-  defp find_paths(graph) do
+  def part_two do
+    graph = input_as_lines() |> Graph.new()
+
+    graph
+    |> find_paths(strategy: TraversalStrategy.SingleRevisit)
+    |> Enum.count()
+  end
+
+  defp find_paths(graph, strategy: strategy) do
     chunk_fn = fn
       "end" = node, path -> {:cont, Enum.reverse([node | path]), []}
       node, path -> {:cont, [node | path]}
@@ -19,29 +31,27 @@ defmodule Aoc21.DayTwelve do
     end
 
     graph
-    |> walk("start")
+    |> walk("start", strategy)
     |> Enum.chunk_while([], chunk_fn, after_fn)
   end
 
-  defp walk(graph, start_vertex, visited \\ [])
+  defp walk(
+         graph,
+         start_vertex,
+         traversal_strategy,
+         visited \\ []
+       )
 
-  defp walk(_graph, "end", visited),
+  defp walk(_graph, "end", _traversal_strategy, visited),
     do: Enum.reverse(["end"] ++ visited)
 
-  defp walk(graph, start_vertex, visited) do
-    small_cave? = fn cave ->
-      cave
-      |> String.to_charlist()
-      |> List.first()
-      |> then(&(&1 in ?a..?z))
-    end
-
+  defp walk(graph, start_vertex, traversal_strategy, visited) do
     for next <- graph |> Map.get(start_vertex), reduce: [] do
       acc ->
         path =
-          if small_cave?.(next) && Enum.member?(visited, next),
-            do: nil,
-            else: walk(graph, next, [start_vertex] ++ visited)
+          if traversal_strategy.legal_move?(start_vertex, next, visited),
+            do: walk(graph, next, traversal_strategy, [start_vertex] ++ visited),
+            else: nil
 
         case path do
           nil -> acc
@@ -49,6 +59,74 @@ defmodule Aoc21.DayTwelve do
           path -> path ++ acc
         end
     end
+  end
+end
+
+defmodule Aoc21.DayTwelve.Graph.TraversalStrategy do
+  @moduledoc """
+  behaviour that describes a graph traversal strategy by determining wether moving to a given node from a current node and a given travel history would be legal or not.
+  """
+  @typep graph_node :: String.t()
+  @callback legal_move?(
+              current_node :: graph_node,
+              considered_node :: graph_node,
+              history :: [graph_node]
+            ) :: boolean()
+end
+
+defmodule Aoc21.DayTwelve.Graph.TraversalStrategy.SingleVisit do
+  @moduledoc """
+  Using this traversal strategy ensures we're visiting the small caves once.
+  """
+  @behaviour Aoc21.DayTwelve.Graph.TraversalStrategy
+
+  def legal_move?(_current_node, "start", _history), do: false
+
+  def legal_move?(_current_node, considered_node, history) do
+    is_revisit? = small_cave?(considered_node) && Enum.member?(history, considered_node)
+    not is_revisit?
+  end
+
+  defp small_cave?(cave) do
+    cave
+    |> String.to_charlist()
+    |> List.first()
+    |> then(&(&1 in ?a..?z))
+  end
+end
+
+defmodule Aoc21.DayTwelve.Graph.TraversalStrategy.SingleRevisit do
+  @moduledoc """
+  Using this traversal strategy ensures we're visiting one small cave at most twice.
+  """
+  @behaviour Aoc21.DayTwelve.Graph.TraversalStrategy
+
+  def legal_move?(_current_node, "start", _history), do: false
+
+  def legal_move?(current_node, considered_node, history) do
+    checker_fn = fn
+      [2, 1 | _rest] -> true
+      [1, 1 | _rest] -> true
+      [1] -> true
+      _ -> false
+    end
+
+    legal_move? =
+      ([considered_node, current_node] ++ history)
+      |> Enum.filter(&small_cave?/1)
+      |> Enum.frequencies()
+      |> Map.values()
+      |> Enum.sort(:desc)
+      |> then(checker_fn)
+
+    legal_move?
+  end
+
+  defp small_cave?(cave) do
+    cave
+    |> String.to_charlist()
+    |> List.first()
+    |> then(&(&1 in ?a..?z))
   end
 end
 
